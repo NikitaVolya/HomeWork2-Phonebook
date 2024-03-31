@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 template <typename Value>
 struct StackElement
 {
@@ -10,49 +8,40 @@ struct StackElement
 };
 
 template <typename Value>
-class StackP
+class Stack
 {
 private:
 	StackElement<Value>* firstElement;
 	int size;
-	bool deleteValues;
-
-	void deleteElement(StackElement<Value>* element);
 public:
-	StackP(bool pDeleteValues = false) : firstElement(nullptr), size(0), deleteValues(pDeleteValues) {};
-	~StackP();
+	Stack() : firstElement(nullptr), size(0) {};
+	~Stack();
 
 	int getSize() { return size; }
 
 	void appfirst(Value pValue);
 	void popfirst();
 
-	StackElement<Value>* getElement(int index);
+	void pop(int index);
+
+	Value getValue(int index);
 };
 
 template<typename Value>
-inline void StackP<Value>::deleteElement(StackElement<Value>* element)
-{
-	if (deleteValues)
-		delete element->val;
-	delete element;
-}
-
-template<typename Value>
-inline StackP<Value>::~StackP()
+Stack<Value>::~Stack()
 {
 	StackElement<Value>* element = firstElement;
 	while (element)
 	{
 		StackElement<Value>* tmp = element;
 		element = element->next;
-		
-		deleteElement(tmp);
+
+		delete tmp;
 	}
 }
 
 template<typename Value>
-inline void StackP<Value>::appfirst(Value pValue)
+void Stack<Value>::appfirst(Value pValue)
 {
 	StackElement<Value>* tmp = new StackElement<Value>{ pValue, nullptr };
 
@@ -64,25 +53,54 @@ inline void StackP<Value>::appfirst(Value pValue)
 }
 
 template<typename Value>
-inline void StackP<Value>::popfirst()
+void Stack<Value>::popfirst()
 {
 	if (!firstElement)
 		return;
 
 	StackElement<Value>* tmp = firstElement;
 	firstElement = firstElement->next;
-	deleteElement(tmp);
+	delete tmp;
+
+	size--;
 }
 
 template<typename Value>
-inline StackElement<Value>* StackP<Value>::getElement(int index)
+inline void Stack<Value>::pop(int index)
 {
 	if (size <= index || index < 0)
-		return nullptr;
+		return;
 
 	StackElement<Value>* element = firstElement;
+	StackElement<Value>* elementNext = firstElement;
 	while (index--)
+	{
+		element = elementNext;
+		elementNext = element->next;
+	}
+
+	if (element == elementNext)
+	{
+		firstElement = element->next;
+		delete element;
+	}
+	else
+	{
+		element->next = elementNext->next;
+		delete elementNext;
+	}
+
+	size--;
+}
+
+template<typename Value>
+Value Stack<Value>::getValue(int index)
+{
+	index = index < 0 ? 0 : index;
+
+	StackElement<Value>* element = firstElement;
+	while (index-- && element)
 		element = element->next;
 
-	return element;
+	return element->val;
 }
