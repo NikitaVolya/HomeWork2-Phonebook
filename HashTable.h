@@ -18,19 +18,18 @@ private:
 	int count, size;
 
 	char* copyline(const char* pStr);
-	unsigned int hashFunction(char* pKey);
+	unsigned int hashFunction(const char* pKey);
 public:
 	HashTable();
 	~HashTable();
 
 	int getCount() { return count; };
 	int getSize() { return size; };
-	Value* get(char* pKey);
-	Value* get(const char* pKey);
+	Value get(const char* pKey);
+	void set(const char* pKey, Value val);
+	Value* getPointer(const char* pKey);
 
-	void insert(char* pKey, Value pValue);
 	void insert(const char* pKey, Value pValue);
-	bool find(char* pKey);
 	bool find(const char* pKey);
 };
 
@@ -46,7 +45,7 @@ inline char* HashTable<Value>::copyline(const char* pStr)
 }
 
 template<typename Value>
-inline unsigned int HashTable<Value>::hashFunction(char* pKey)
+inline unsigned int HashTable<Value>::hashFunction(const char* pKey)
 {
 	unsigned int sum = 0;
 	for (int j = 0; pKey[j]; j++)
@@ -55,7 +54,7 @@ inline unsigned int HashTable<Value>::hashFunction(char* pKey)
 }
 
 template<typename Value>
-inline HashTable<Value>::HashTable() : count(0), size(100)
+inline HashTable<Value>::HashTable() : count(0), size(500)
 {
 	table = new Stack<HashElement<Value>*>*[size];
 	for (int i = 0; i < size; i++)
@@ -69,6 +68,7 @@ inline HashTable<Value>::~HashTable()
 	{
 		for (int j = 0; j < table[i]->getSize(); j++)
 		{
+			HashElement<Value>* element = table[i]->getValue(j);
 			delete element->key;
 			delete element;
 		}
@@ -78,7 +78,26 @@ inline HashTable<Value>::~HashTable()
 }
 
 template<typename Value>
-inline Value* HashTable<Value>::get(char* pKey)
+inline Value HashTable<Value>::get(const char* pKey)
+{
+	unsigned int index = hashFunction(pKey);
+
+	Stack<HashElement<Value>*>* column = table[index];
+
+	for (int i = 0; i < column->getSize(); i++)
+		if (std::strcmp(column->getValue(i)->key, pKey) == 0)
+			return column->getValue(i)->value;
+}
+
+template<typename Value>
+inline void HashTable<Value>::set(const char* pKey, Value pValue)
+{
+	Value* val = getPointer(pKey);
+	*val = pValue;
+}
+
+template<typename Value>
+inline Value* HashTable<Value>::getPointer(const char* pKey)
 {
 	unsigned int index = hashFunction(pKey);
 
@@ -91,22 +110,14 @@ inline Value* HashTable<Value>::get(char* pKey)
 }
 
 template<typename Value>
-inline Value* HashTable<Value>::get(const char* pKey)
-{
-	char* newKey = copyline(pKey);
-	Value* res = get(newKey);
-	delete newKey;
-	return res;
-}
-
-template<typename Value>
-inline void HashTable<Value>::insert(char* pKey, Value pValue)
+inline void HashTable<Value>::insert(const char* pKey, Value pValue)
 {
 	unsigned int index = hashFunction(pKey);
 
 	char* newKey = copyline(pKey);
 
 	HashElement<Value>* newElement = new HashElement<Value>{ newKey, pValue };
+
 
 	for (int i = 0; i < table[index]->getSize(); i++)
 		if (std::strcmp(table[index]->getValue(i)->key, pKey) == 0)
@@ -119,15 +130,7 @@ inline void HashTable<Value>::insert(char* pKey, Value pValue)
 }
 
 template<typename Value>
-inline void HashTable<Value>::insert(const char* pKey, Value pValue)
-{
-	char* newKey = copyline(pKey);
-	insert(newKey, pValue);
-	delete newKey;
-}
-
-template<typename Value>
-inline bool HashTable<Value>::find(char* pKey)
+inline bool HashTable<Value>::find(const char* pKey)
 {
 	unsigned int index = hashFunction(pKey);
 
@@ -137,13 +140,4 @@ inline bool HashTable<Value>::find(char* pKey)
 		if (std::strcmp(column->getValue(i)->key, pKey) == 0)
 			return true;
 	return false;
-}
-
-template<typename Value>
-inline bool HashTable<Value>::find(const char* pKey)
-{
-	char* newKey = copyline(pKey);
-	bool res = find(newKey);
-	delete newKey;
-	return res;
 }

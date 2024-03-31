@@ -1,24 +1,26 @@
 #include <iostream>
 
+#include "PhoneUser.h"
 #include "HashTable.h"
-#include "Stack.h"
 
 using namespace std;
 
+unsigned long long PhoneUser::globalID = 0;
+
 int main()
 {
-	HashTable<int>* dict = new HashTable<int>();
+	HashTable<PhoneUser*> dict;
 
-	dict->insert("lol", 5);
-	dict->insert("test", 7);
+	PhoneUser* a = new PhoneUser{ "Nikita", "0981132029", "-", "-", "Nice man" };
+	PhoneUser* b = new PhoneUser{ "Artem", "5", "-", "-", nullptr };
 
-	int* value = dict->get("lol");
+	dict.insert("1", a);
+	dict.set("1", b);
 
-	cout << *value << endl;
+	cout << dict.get("1")->getHomePhone();
 
-	delete dict;
-
-	cout << *value;
+	delete a;
+	delete b;
 
 	return 0;
 }

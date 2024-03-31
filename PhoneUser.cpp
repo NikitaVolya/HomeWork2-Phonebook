@@ -13,6 +13,13 @@ void PhoneUser::changeCharLine(const char* line, char*& value)
     if (value)
         delete[] value;
 
+    if (!line)
+    {
+        value = nullptr;
+        return;
+    }
+
+
     int len = std::strlen(line) + 1;
     value = new char[len];
 
@@ -20,7 +27,7 @@ void PhoneUser::changeCharLine(const char* line, char*& value)
         value[i] = line[i];
 }
 
-PhoneUser::PhoneUser(const char* pName, const char* pHomePhone, const char* pWorkPhone, const char* pPersonePhone, const char* pDescription)
+PhoneUser::PhoneUser(const char* pName, const char* pHomePhone, const char* pWorkPhone, const char* pPersonePhone, const char* pDescription) : userID(newUserId())
 {
     setName(pName);
     setHomePhone(pHomePhone);
