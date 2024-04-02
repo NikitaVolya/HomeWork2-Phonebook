@@ -25,8 +25,12 @@ public:
 
 	int getCount() { return count; };
 	int getSize() { return size; };
+
 	Value get(const char* pKey);
+	Value getByIndex(int index);
 	void set(const char* pKey, Value val);
+	bool remove(const char* pKey);
+
 	Value* getPointer(const char* pKey);
 
 	void insert(const char* pKey, Value pValue);
@@ -90,10 +94,41 @@ inline Value HashTable<Value>::get(const char* pKey)
 }
 
 template<typename Value>
+inline Value HashTable<Value>::getByIndex(int index)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (table[i]->getSize() == 0)
+			continue;
+		else if (index < table[i]->getSize())
+			return table[i]->getValue(index)->value;
+		else
+			index -= table[i]->getSize();
+	}
+}
+
+template<typename Value>
 inline void HashTable<Value>::set(const char* pKey, Value pValue)
 {
 	Value* val = getPointer(pKey);
 	*val = pValue;
+}
+
+template<typename Value>
+inline bool HashTable<Value>::remove(const char* pKey)
+{
+	unsigned int index = hashFunction(pKey);
+
+	Stack<HashElement<Value>*>* column = table[index];
+
+	for (int i = 0; i < column->getSize(); i++)
+		if (std::strcmp(column->getValue(i)->key, pKey) == 0)
+		{
+			column->pop(i);
+			count--;
+			return true;
+		}
+	return false;
 }
 
 template<typename Value>
@@ -116,6 +151,12 @@ inline void HashTable<Value>::insert(const char* pKey, Value pValue)
 
 	char* newKey = copyline(pKey);
 
+	if (find(newKey))
+	{
+		set(newKey, pValue);
+		return;
+	}
+
 	HashElement<Value>* newElement = new HashElement<Value>{ newKey, pValue };
 
 
@@ -127,6 +168,7 @@ inline void HashTable<Value>::insert(const char* pKey, Value pValue)
 		}
 
 	table[index]->appfirst(newElement);
+	count++;
 }
 
 template<typename Value>
@@ -137,7 +179,9 @@ inline bool HashTable<Value>::find(const char* pKey)
 	Stack<HashElement<Value>*>* column = table[index];
 
 	for (int i = 0; i < column->getSize(); i++)
+	{
 		if (std::strcmp(column->getValue(i)->key, pKey) == 0)
 			return true;
+	}
 	return false;
 }

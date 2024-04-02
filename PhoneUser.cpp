@@ -2,52 +2,35 @@
 
 const char* PhoneUser::getCharLine(char* value)
 {
-    if (value)
+    if (value[0])
         return value;
     else
         return "None";
 }
 
-void PhoneUser::changeCharLine(const char* line, char*& value)
+void PhoneUser::changeCharLine(const char* line, char* value, const int size)
 {
-    if (value)
-        delete[] value;
-
     if (!line)
     {
-        value = nullptr;
+        value[0] = '\0';
         return;
     }
 
-
     int len = std::strlen(line) + 1;
-    value = new char[len];
 
-    for (int i = 0; i < len; i++)
+    int i = 0;
+    for (; i < len && i < size; i++)
         value[i] = line[i];
+    value[i + 1] = '\0';
 }
 
-PhoneUser::PhoneUser(const char* pName, const char* pHomePhone, const char* pWorkPhone, const char* pPersonePhone, const char* pDescription) : userID(newUserId())
+PhoneUser::PhoneUser(const char* pName, const char* pHomePhone, const char* pWorkPhone, const char* pPersonePhone, const char* pDescription)
 {
     setName(pName);
     setHomePhone(pHomePhone);
     setWorkPhone(pWorkPhone);
     setPersonePhone(pPersonePhone);
     setDescription(pDescription);
-}
-
-PhoneUser::~PhoneUser()
-{
-    if (name)
-        delete[] name;
-    if (homePhone)
-        delete[] homePhone;
-    if (workPhone)
-        delete[] workPhone;
-    if (personePhone)
-        delete[] personePhone;
-    if (description)
-        delete[] description;
 }
 
 void PhoneUser::print()

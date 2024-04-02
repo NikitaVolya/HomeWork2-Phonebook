@@ -6,42 +6,36 @@
 class PhoneUser
 {
 private:
-	static unsigned long long globalID;
-	static unsigned long long newUserId() { return globalID++; };
 
-	unsigned long long userID;
-	char* name;
-	char* homePhone;
-	char* workPhone;
-	char* personePhone;
-	char* description;
+	char name[40];
+	char homePhone[15];
+	char workPhone[15];
+	char personePhone[15];
+	char description[40];
 
 	const char* getCharLine(char* value);
-	void changeCharLine(const char* line, char*& value);
+	void changeCharLine(const char* line, char* value, const int size);
 public:
 
-	PhoneUser() : userID(newUserId()),
-				  name(nullptr),
-				  homePhone(nullptr), 
-				  workPhone(nullptr), 
-				  personePhone(nullptr), 
-				  description(nullptr) {};
+	PhoneUser() : name("\0"),
+				  homePhone("\0"),
+				  workPhone("\0"),
+				  personePhone("\0"),
+				  description("\0") {};
 
 	PhoneUser(const char* pName, const char* pHomePhone, const char* pWorkPhone, const char* pPersonePhone, const char* pDescription);
-	~PhoneUser();
 
-	const int getUserId() { return userID; };
 	const char* getName() { return getCharLine(name); };
 	const char* getHomePhone() { return getCharLine(homePhone); };
 	const char* getWorkPhone() { return getCharLine(workPhone); };
 	const char* getPersonePhone() { return getCharLine(personePhone); };
 	const char* getDescription() { return getCharLine(description); };
 
-	void setName(const char* pName) { changeCharLine(pName, name); };
-	void setHomePhone(const char* pHomePhone) { changeCharLine(pHomePhone, homePhone); };
-	void setWorkPhone(const char* pWorkPhone) { changeCharLine(pWorkPhone, workPhone); };
-	void setPersonePhone(const char* pPersonePhone) { changeCharLine(pPersonePhone, personePhone); };
-	void setDescription(const char* pDescription) { changeCharLine(pDescription, description); };
+	void setName(const char* pName) { changeCharLine(pName, name, 40); };
+	void setHomePhone(const char* pHomePhone) { changeCharLine(pHomePhone, homePhone, 13); };
+	void setWorkPhone(const char* pWorkPhone) { changeCharLine(pWorkPhone, workPhone, 13); };
+	void setPersonePhone(const char* pPersonePhone) { changeCharLine(pPersonePhone, personePhone, 13); };
+	void setDescription(const char* pDescription) { changeCharLine(pDescription, description, 13); };
 
 	void print();
 };
